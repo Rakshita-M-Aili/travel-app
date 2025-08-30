@@ -1,0 +1,81 @@
+{
+  "name": "TourPackage",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Tour package name"
+    },
+    "destination": {
+      "type": "string",
+      "description": "Main destination"
+    },
+    "duration_days": {
+      "type": "number",
+      "description": "Tour duration in days"
+    },
+    "price": {
+      "type": "number",
+      "description": "Total package price per person"
+    },
+    "max_participants": {
+      "type": "number",
+      "description": "Maximum number of participants"
+    },
+    "available_spots": {
+      "type": "number",
+      "description": "Available spots for booking"
+    },
+    "inclusions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "What's included in the package"
+    },
+    "exclusions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "What's not included"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Tour start date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Tour end date"
+    },
+    "difficulty_level": {
+      "type": "string",
+      "enum": [
+        "easy",
+        "moderate",
+        "challenging",
+        "extreme"
+      ],
+      "default": "moderate",
+      "description": "Tour difficulty level"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed tour description"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Tour package image URL"
+    }
+  },
+  "required": [
+    "name",
+    "destination",
+    "duration_days",
+    "price",
+    "start_date",
+    "end_date"
+  ]
+}

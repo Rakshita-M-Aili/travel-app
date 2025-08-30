@@ -1,0 +1,90 @@
+import React, { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search, ArrowLeftRight } from "lucide-react";
+
+export default function FlightSearchForm({ onSearch }) {
+  const [searchData, setSearchData] = useState({
+    from: "",
+    to: "",
+    date: "",
+    passengers: 1
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSearch(searchData);
+  };
+
+  const swapCities = () => {
+    setSearchData(prev => ({
+      ...prev,
+      from: prev.to,
+      to: prev.from
+    }));
+  };
+
+  return (
+    <Card className="shadow-lg border-0 bg-white">
+      <CardContent className="p-6">
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+            <div className="md:col-span-2">
+              <label className="text-sm font-medium text-slate-700 block mb-2">From</label>
+              <Input
+                placeholder="Departure city"
+                value={searchData.from}
+                onChange={(e) => setSearchData({...searchData, from: e.target.value})}
+                className="h-12"
+              />
+            </div>
+
+            <div className="flex justify-center md:col-span-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={swapCities}
+                className="h-12 w-12 rounded-full border-2 border-slate-200 hover:border-blue-500 hover:bg-blue-50"
+              >
+                <ArrowLeftRight className="w-5 h-5" />
+              </Button>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="text-sm font-medium text-slate-700 block mb-2">To</label>
+              <Input
+                placeholder="Arrival city"
+                value={searchData.to}
+                onChange={(e) => setSearchData({...searchData, to: e.target.value})}
+                className="h-12"
+              />
+            </div>
+
+            <div className="md:col-span-1">
+              <label className="text-sm font-medium text-slate-700 block mb-2">Date</label>
+              <Input
+                type="date"
+                value={searchData.date}
+                onChange={(e) => setSearchData({...searchData, date: e.target.value})}
+                className="h-12"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-center mt-6">
+            <Button 
+              type="submit" 
+              size="lg"
+              className="px-8 bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+            >
+              <Search className="w-5 h-5 mr-2" />
+              Search Flights
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}

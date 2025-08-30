@@ -1,0 +1,70 @@
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+
+export default function FlightFilters({ filters, onFilterChange, flights }) {
+  const airlines = [...new Set(flights.map(f => f.airline))].filter(Boolean);
+  const classes = [...new Set(flights.map(f => f.class_type))].filter(Boolean);
+
+  const handleFilterChange = (key, value) => {
+    onFilterChange({
+      ...filters,
+      [key]: value
+    });
+  };
+
+  return (
+    <Card className="border-0 shadow-md">
+      <CardHeader>
+        <CardTitle className="text-lg">Filter Flights</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div>
+          <Label className="text-sm font-medium mb-3 block">
+            Price Range: ${filters.priceRange[0]} - ${filters.priceRange[1]}
+          </Label>
+          <Slider
+            value={filters.priceRange}
+            onValueChange={(value) => handleFilterChange('priceRange', value)}
+            max={2000}
+            min={0}
+            step={50}
+            className="w-full"
+          />
+        </div>
+
+        <div>
+          <Label className="text-sm font-medium mb-2 block">Airline</Label>
+          <Select value={filters.airline} onValueChange={(value) => handleFilterChange('airline', value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Any airline" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={null}>Any airline</SelectItem>
+              {airlines.map(airline => (
+                <SelectItem key={airline} value={airline}>{airline}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Label className="text-sm font-medium mb-2 block">Class</Label>
+          <Select value={filters.class} onValueChange={(value) => handleFilterChange('class', value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Any class" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={null}>Any class</SelectItem>
+              {classes.map(cls => (
+                <SelectItem key={cls} value={cls}>{cls}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

@@ -1,0 +1,169 @@
+import React, { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Booking, User } from "@/entities/all";
+import { CreditCard, User as UserIcon, Phone, Mail } from "lucide-react";
+
+export default function BookingModal({ isOpen, onClose, item, bookingType }) {
+  const [formData, setFormData] = useState({
+    customer_name: "",
+    customer_email: "",
+    customer_phone: "",
+    num_passengers: 1,
+    special_requests: ""
+  });
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsProcessing(true);
+
+    try {
+      const user = await User.me();
+      const bookingReference = `${bookingType.toUpperCase()}${Date.now()}`;
+      
+      const bookingData = {
+        booking_type: bookingType,
+        reference_id: item.id,
+        booking_reference: bookingReference,
+        customer_name: formData.customer_name || user.full_name,
+        customer_email: formData.customer_email || user.email,
+        customer_phone: formData.customer_phone,
+        total_amount: item.price * formData.num_passengers,
+        payment_status: "pending",
+        booking_status: "confirmed",
+        booking_date: new Date().toISOString().split('T')[0],
+        travel_date: bookingType === 'flight' ? item.departure_date : item.start_date,
+        num_passengers: formData.num_passengers,
+        special_requests: formData.special_requests
+      };
+
+      await Booking.create(bookingData);
+      alert("Booking confirmed! You will receive a confirmation email shortly.");
+      onClose();
+    } catch (error) {
+      console.error("Booking error:", error);
+      alert("Booking failed. Please try again.");
+    }
+
+    setIsProcessing(false);
+  };
+
+  const handleChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <CreditCard className="w-5 h-5" />
+            Complete Your Booking
+          </DialogTitle>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="bg-slate-50 p-4 rounded-lg">
+            <h3 className="font-semibold text-slate-800 mb-2">Booking Summary</h3>
+            <div className="text-sm space-y-1">
+              <div className="flex justify-between">
+                <span>{bookingType === 'flight' ? 'Flight' : bookingType === 'hotel' ? 'Hotel' : 'Tour'}:</span>
+                <span className="font-medium">
+                  {item.airline || item.name}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Price per person:</span>
+                <span className="font-medium">${item.price}</span>
+              </div>
+              <div className="flex justify-between font-semibold text-base pt-2 border-t">
+                <span>Total:</span>
+                <span>${(item.price * formData.num_passengers).toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="flex items-center gap-2 mb-2">
+                <UserIcon className="w-4 h-4" />
+                Full Name
+              </Label>
+              <Input
+                value={formData.customer_name}
+                onChange={(e) => handleChange('customer_name', e.target.value)}
+                placeholder="Enter your full name"
+                required
+              />
+            </div>
+            <div>
+              <Label className="flex items-center gap-2 mb-2">
+                <Mail className="w-4 h-4" />
+                Email
+              </Label>
+              <Input
+                type="email"
+                value={formData.customer_email}
+                onChange={(e) => handleChange('customer_email', e.target.value)}
+                placeholder="your@email.com"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="flex items-center gap-2 mb-2">
+                <Phone className="w-4 h-4" />
+                Phone Number
+              </Label>
+              <Input
+                value={formData.customer_phone}
+                onChange={(e) => handleChange('customer_phone', e.target.value)}
+                placeholder="+1 (555) 123-4567"
+                required
+              />
+            </div>
+            <div>
+              <Label className="mb-2 block">Number of {bookingType === 'hotel' ? 'Guests' : 'Passengers'}</Label>
+              <Input
+                type="number"
+                min="1"
+                value={formData.num_passengers}
+                onChange={(e) => handleChange('num_passengers', parseInt(e.target.value))}
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label className="mb-2 block">Special Requests (Optional)</Label>
+            <Textarea
+              value={formData.special_requests}
+              onChange={(e) => handleChange('special_requests', e.target.value)}
+              placeholder="Any special requirements or requests..."
+              rows={3}
+            />
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+              Cancel
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={isProcessing}
+              className="flex-1 bg-blue-600 hover:bg-blue-700"
+            >
+              {isProcessing ? "Processing..." : "Confirm Booking"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

@@ -1,0 +1,107 @@
+import React, { useState, useEffect, useCallback } from "react";
+import { Hotel } from "@/entities/Hotel";
+import HotelSearchForm from "../components/hotels/HotelSearchForm";
+import HotelResults from "../components/hotels/HotelResults";
+import HotelFilters from "../components/hotels/HotelFilters";
+import { Building2 } from "lucide-react";
+
+export default function Hotels() {
+  const [hotels, setHotels] = useState([]);
+  const [filteredHotels, setFilteredHotels] = useState([]);
+  const [searchCriteria, setSearchCriteria] = useState({});
+  const [filters, setFilters] = useState({
+    priceRange: [0, 1000],
+    starRating: 0,
+    amenities: []
+  });
+  const [isLoading, setIsLoading] = useState(false);
+
+  const applyFilters = useCallback(() => {
+    let filtered = hotels;
+
+    if (searchCriteria.destination) {
+      filtered = filtered.filter(hotel => 
+        hotel.city?.toLowerCase().includes(searchCriteria.destination.toLowerCase())
+      );
+    }
+    
+    filtered = filtered.filter(hotel => 
+      hotel.price_per_night >= filters.priceRange[0] && hotel.price_per_night <= filters.priceRange[1]
+    );
+
+    if (filters.starRating > 0) {
+      filtered = filtered.filter(hotel => hotel.star_rating >= filters.starRating);
+    }
+
+    if (filters.amenities.length > 0) {
+      filtered = filtered.filter(hotel => 
+        filters.amenities.every(amenity => hotel.amenities?.includes(amenity))
+      );
+    }
+
+    setFilteredHotels(filtered);
+  }, [hotels, filters, searchCriteria]);
+
+  useEffect(() => {
+    loadHotels();
+  }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [applyFilters]);
+
+  const loadHotels = async () => {
+    setIsLoading(true);
+    try {
+      const allHotels = await Hotel.list("-created_date");
+      setHotels(allHotels);
+    } catch (error) {
+      console.error("Error loading hotels:", error);
+    }
+    setIsLoading(false);
+  };
+
+  const handleSearch = (criteria) => {
+    setSearchCriteria(criteria);
+  };
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center">
+              <Building2 className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-slate-800">Find Your Perfect Stay</h1>
+          </div>
+          <p className="text-slate-600 text-lg">
+            Search and book hotels from luxury resorts to budget-friendly inns
+          </p>
+        </div>
+
+        <HotelSearchForm onSearch={handleSearch} />
+
+        <div className="grid lg:grid-cols-4 gap-6 mt-8">
+          <div className="lg:col-span-1">
+            <HotelFilters 
+              filters={filters} 
+              onFilterChange={handleFilterChange}
+              hotels={hotels}
+            />
+          </div>
+          <div className="lg:col-span-3">
+            <HotelResults 
+              hotels={filteredHotels} 
+              isLoading={isLoading}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

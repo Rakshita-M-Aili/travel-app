@@ -1,0 +1,62 @@
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+
+const DIFFICULTIES = ["easy", "moderate", "challenging", "extreme"];
+
+export default function TourFilters({ filters, onFilterChange }) {
+
+  const handleFilterChange = (key, value) => {
+    onFilterChange({ ...filters, [key]: value });
+  };
+
+  return (
+    <Card className="border-0 shadow-md">
+      <CardHeader>
+        <CardTitle className="text-lg">Filter Tours</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div>
+          <Label className="text-sm font-medium mb-3 block">
+            Max Price: ${filters.priceRange[0]} - ${filters.priceRange[1]}
+          </Label>
+          <Slider
+            value={filters.priceRange}
+            onValueChange={(value) => handleFilterChange('priceRange', value)}
+            max={5000}
+            min={0}
+            step={100}
+          />
+        </div>
+        <div>
+          <Label className="text-sm font-medium mb-3 block">
+            Max Duration: {filters.duration || 'Any'} days
+          </Label>
+          <Slider
+            value={[filters.duration]}
+            onValueChange={(value) => handleFilterChange('duration', value[0])}
+            max={30}
+            min={0}
+            step={1}
+          />
+        </div>
+        <div>
+          <Label className="text-sm font-medium mb-2 block">Difficulty</Label>
+          <Select value={filters.difficulty} onValueChange={(value) => handleFilterChange('difficulty', value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Any difficulty" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={null}>Any difficulty</SelectItem>
+              {DIFFICULTIES.map(d => (
+                <SelectItem key={d} value={d}>{d.charAt(0).toUpperCase() + d.slice(1)}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

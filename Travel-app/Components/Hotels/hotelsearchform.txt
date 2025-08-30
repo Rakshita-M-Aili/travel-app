@@ -1,0 +1,67 @@
+import React, { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search, Users } from "lucide-react";
+
+export default function HotelSearchForm({ onSearch }) {
+  const [searchData, setSearchData] = useState({
+    destination: "",
+    checkIn: "",
+    checkOut: "",
+    guests: 1
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSearch(searchData);
+  };
+
+  return (
+    <Card className="shadow-lg border-0 bg-white">
+      <CardContent className="p-6">
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div className="md:col-span-2">
+              <label className="text-sm font-medium text-slate-700 block mb-2">Destination</label>
+              <Input
+                placeholder="e.g., New York, Paris"
+                value={searchData.destination}
+                onChange={(e) => setSearchData({...searchData, destination: e.target.value})}
+                className="h-12"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-slate-700 block mb-2">Check-in</label>
+              <Input
+                type="date"
+                value={searchData.checkIn}
+                onChange={(e) => setSearchData({...searchData, checkIn: e.target.value})}
+                className="h-12"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-slate-700 block mb-2">Check-out</label>
+              <Input
+                type="date"
+                value={searchData.checkOut}
+                onChange={(e) => setSearchData({...searchData, checkOut: e.target.value})}
+                className="h-12"
+              />
+            </div>
+          </div>
+          <div className="flex justify-center mt-6">
+            <Button 
+              type="submit" 
+              size="lg"
+              className="px-8 bg-green-600 hover:bg-green-700 text-white font-semibold"
+            >
+              <Search className="w-5 h-5 mr-2" />
+              Search Hotels
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}

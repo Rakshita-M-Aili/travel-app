@@ -1,0 +1,104 @@
+import React, { useState, useEffect, useCallback } from "react";
+import { TourPackage } from "@/entities/TourPackage";
+import TourSearchForm from "../components/tours/TourSearchForm";
+import TourResults from "../components/tours/TourResults";
+import TourFilters from "../components/tours/TourFilters";
+import { MapPin } from "lucide-react";
+
+export default function Tours() {
+  const [tours, setTours] = useState([]);
+  const [filteredTours, setFilteredTours] = useState([]);
+  const [searchCriteria, setSearchCriteria] = useState({});
+  const [filters, setFilters] = useState({
+    priceRange: [0, 5000],
+    duration: 0,
+    difficulty: ""
+  });
+  const [isLoading, setIsLoading] = useState(false);
+
+  const applyFilters = useCallback(() => {
+    let filtered = tours;
+
+    if (searchCriteria.destination) {
+      filtered = filtered.filter(tour => 
+        tour.destination?.toLowerCase().includes(searchCriteria.destination.toLowerCase())
+      );
+    }
+    
+    filtered = filtered.filter(tour => 
+      tour.price >= filters.priceRange[0] && tour.price <= filters.priceRange[1]
+    );
+
+    if (filters.duration > 0) {
+      filtered = filtered.filter(tour => tour.duration_days <= filters.duration);
+    }
+
+    if (filters.difficulty) {
+      filtered = filtered.filter(tour => tour.difficulty_level === filters.difficulty);
+    }
+
+    setFilteredTours(filtered);
+  }, [tours, filters, searchCriteria]);
+
+  useEffect(() => {
+    loadTours();
+  }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [applyFilters]);
+
+  const loadTours = async () => {
+    setIsLoading(true);
+    try {
+      const allTours = await TourPackage.list("-created_date");
+      setTours(allTours);
+    } catch (error) {
+      console.error("Error loading tours:", error);
+    }
+    setIsLoading(false);
+  };
+
+  const handleSearch = (criteria) => {
+    setSearchCriteria(criteria);
+  };
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center">
+              <MapPin className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-slate-800">Explore Our Tours</h1>
+          </div>
+          <p className="text-slate-600 text-lg">
+            Discover curated travel experiences and guided tours
+          </p>
+        </div>
+
+        <TourSearchForm onSearch={handleSearch} />
+
+        <div className="grid lg:grid-cols-4 gap-6 mt-8">
+          <div className="lg:col-span-1">
+            <TourFilters 
+              filters={filters} 
+              onFilterChange={handleFilterChange}
+            />
+          </div>
+          <div className="lg:col-span-3">
+            <TourResults 
+              tours={filteredTours} 
+              isLoading={isLoading}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

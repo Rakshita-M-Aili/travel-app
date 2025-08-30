@@ -1,0 +1,101 @@
+import React, { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Plane, Clock, Calendar, Users } from "lucide-react";
+import BookingModal from "../booking/BookingModal";
+
+export default function FlightCard({ flight }) {
+  const [showBooking, setShowBooking] = useState(false);
+
+  const formatTime = (time) => {
+    return time || "00:00";
+  };
+
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString();
+  };
+
+  return (
+    <>
+      <Card className="hover:shadow-lg transition-all duration-300 border-0 shadow-md">
+        <CardContent className="p-6">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Plane className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-slate-800">{flight.airline}</h3>
+                  <p className="text-sm text-slate-600">{flight.flight_number}</p>
+                </div>
+                <Badge variant="outline" className="ml-2">
+                  {flight.class_type}
+                </Badge>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-slate-400" />
+                  <span className="text-slate-600">
+                    {formatDate(flight.departure_date)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-slate-400" />
+                  <span className="text-slate-600">
+                    {formatTime(flight.departure_time)} - {formatTime(flight.arrival_time)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-slate-400" />
+                  <span className="text-slate-600">
+                    {flight.available_seats} seats available
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-3 flex items-center justify-between">
+                <div className="text-lg">
+                  <span className="font-medium text-slate-600">
+                    {flight.departure_city} → {flight.arrival_city}
+                  </span>
+                </div>
+                {flight.duration && (
+                  <Badge variant="secondary">
+                    Duration: {flight.duration}
+                  </Badge>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-col items-end gap-3">
+              <div className="text-right">
+                <div className="text-3xl font-bold text-slate-800">
+                  ${flight.price}
+                </div>
+                <div className="text-sm text-slate-600">per person</div>
+              </div>
+              <Button 
+                size="lg"
+                onClick={() => setShowBooking(true)}
+                className="bg-orange-500 hover:bg-orange-600 text-white px-6"
+                disabled={flight.available_seats === 0}
+              >
+                {flight.available_seats === 0 ? "Sold Out" : "Book Now"}
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <BookingModal
+        isOpen={showBooking}
+        onClose={() => setShowBooking(false)}
+        item={flight}
+        bookingType="flight"
+      />
+    </>
+  );
+}

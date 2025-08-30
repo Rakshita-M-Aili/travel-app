@@ -1,0 +1,141 @@
+import React, { useState, useEffect } from "react";
+import { Booking, User, Flight, Hotel, TourPackage } from "@/entities/all";
+import { Card, CardContent } from "@/components/ui/card";
+import { Calendar, Plane, Building2, MapPin } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+
+function BookingItem({ booking }) {
+  const [item, setItem] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchItem = async () => {
+      setIsLoading(true);
+      try {
+        let fetchedItem;
+        if (booking.booking_type === 'flight') {
+          fetchedItem = await Flight.get(booking.reference_id);
+        } else if (booking.booking_type === 'hotel') {
+          fetchedItem = await Hotel.get(booking.reference_id);
+        } else if (booking.booking_type === 'tour') {
+          fetchedItem = await TourPackage.get(booking.reference_id);
+        }
+        setItem(fetchedItem);
+      } catch (error) {
+        console.error("Error fetching booking item:", error);
+      }
+      setIsLoading(false);
+    };
+    fetchItem();
+  }, [booking]);
+  
+  const getIcon = () => {
+    switch(booking.booking_type) {
+      case 'flight': return <Plane className="w-5 h-5 text-blue-600" />;
+      case 'hotel': return <Building2 className="w-5 h-5 text-green-600" />;
+      case 'tour': return <MapPin className="w-5 h-5 text-purple-600" />;
+      default: return null;
+    }
+  };
+
+  const renderDetails = () => {
+    if (isLoading) return <Skeleton className="h-5 w-3/4" />;
+    if (!item) return <p className="text-red-500">Booking details not available.</p>;
+
+    switch(booking.booking_type) {
+      case 'flight': return <p>{item.airline}: {item.departure_city} to {item.arrival_city}</p>;
+      case 'hotel': return <p>{item.name}, {item.city}</p>;
+      case 'tour': return <p>{item.name} to {item.destination}</p>;
+      default: return null;
+    }
+  };
+
+  return (
+    <Card className="shadow-md">
+      <CardContent className="p-6">
+        <div className="flex justify-between items-start">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">{getIcon()}</div>
+              <div>
+                <h3 className="font-bold text-lg text-slate-800 capitalize">{booking.booking_type} Booking</h3>
+                {renderDetails()}
+              </div>
+            </div>
+            <p className="text-sm text-slate-500">Booking Ref: {booking.booking_reference}</p>
+          </div>
+          <div className="text-right">
+            <p className="font-bold text-xl">${booking.total_amount.toFixed(2)}</p>
+            <p className="text-sm text-slate-500">
+              {new Date(booking.travel_date).toLocaleDateString()}
+            </p>
+            <p className="text-sm text-slate-500 capitalize">Status: {booking.booking_status}</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+export default function Bookings() {
+  const [bookings, setBookings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const checkUserAndLoadBookings = async () => {
+      try {
+        const currentUser = await User.me();
+        setUser(currentUser);
+        const userBookings = await Booking.filter({ customer_email: currentUser.email });
+        setBookings(userBookings);
+      } catch (error) {
+        console.error("Must be logged in to see bookings", error);
+      }
+      setIsLoading(false);
+    };
+    checkUserAndLoadBookings();
+  }, []);
+  
+  if (isLoading) {
+    return <div className="p-8"><Skeleton className="h-20 w-full" /></div>;
+  }
+  
+  if (!user) {
+    return (
+      <div className="p-8 text-center">
+        <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
+        <p>Please log in to view your bookings.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+              <Calendar className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-slate-800">My Bookings</h1>
+          </div>
+          <p className="text-slate-600 text-lg">
+            Manage and view all your travel reservations
+          </p>
+        </div>
+        
+        {bookings.length > 0 ? (
+          <div className="space-y-4">
+            {bookings.map(booking => <BookingItem key={booking.id} booking={booking} />)}
+          </div>
+        ) : (
+          <Card className="text-center p-12">
+            <h3 className="text-xl font-semibold">No bookings yet</h3>
+            <p className="text-slate-600">Start exploring and book your next adventure!</p>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}

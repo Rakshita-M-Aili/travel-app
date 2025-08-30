@@ -1,0 +1,42 @@
+import React, { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+
+export default function TourSearchForm({ onSearch }) {
+  const [destination, setDestination] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSearch({ destination });
+  };
+
+  return (
+    <Card className="shadow-lg border-0 bg-white">
+      <CardContent className="p-6">
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div className="md:col-span-2">
+              <label className="text-sm font-medium text-slate-700 block mb-2">Destination</label>
+              <Input
+                placeholder="e.g., Paris, Bali, Kenya"
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+                className="h-12"
+              />
+            </div>
+            <Button 
+              type="submit" 
+              size="lg"
+              className="px-8 bg-purple-600 hover:bg-purple-700 text-white font-semibold h-12 w-full"
+            >
+              <Search className="w-5 h-5 mr-2" />
+              Find Tours
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}

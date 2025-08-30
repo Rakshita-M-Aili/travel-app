@@ -1,0 +1,58 @@
+import React, { useState } from "react";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Star, Wifi, ParkingCircle } from "lucide-react";
+import BookingModal from "../booking/BookingModal";
+
+export default function HotelCard({ hotel }) {
+  const [showBooking, setShowBooking] = useState(false);
+
+  return (
+    <>
+      <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 border-0 shadow-md flex flex-col">
+        <div className="relative h-48 overflow-hidden">
+          <img 
+            src={hotel.image_url} 
+            alt={hotel.name}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          />
+        </div>
+        <CardContent className="p-4 flex-grow">
+          <div className="flex justify-between items-start mb-2">
+            <h3 className="font-bold text-lg text-slate-800 pr-2">{hotel.name}</h3>
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+              <span className="font-semibold">{hotel.star_rating}</span>
+            </div>
+          </div>
+          <p className="text-sm text-slate-500 mb-3">{hotel.city}, {hotel.country}</p>
+          <div className="flex flex-wrap gap-2">
+            {hotel.amenities?.slice(0, 3).map(amenity => (
+              <Badge key={amenity} variant="secondary">{amenity}</Badge>
+            ))}
+          </div>
+        </CardContent>
+        <CardFooter className="p-4 flex justify-between items-center bg-slate-50">
+          <div>
+            <p className="text-xl font-bold text-slate-800">${hotel.price_per_night}</p>
+            <p className="text-xs text-slate-500">per night</p>
+          </div>
+          <Button 
+            onClick={() => setShowBooking(true)}
+            className="bg-orange-500 hover:bg-orange-600"
+            disabled={hotel.available_rooms === 0}
+          >
+            {hotel.available_rooms === 0 ? 'Fully Booked' : 'Book Now'}
+          </Button>
+        </CardFooter>
+      </Card>
+      <BookingModal
+        isOpen={showBooking}
+        onClose={() => setShowBooking(false)}
+        item={{...hotel, price: hotel.price_per_night, start_date: new Date().toISOString().split('T')[0]}}
+        bookingType="hotel"
+      />
+    </>
+  );
+}

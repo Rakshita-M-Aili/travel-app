@@ -1,0 +1,126 @@
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Plane, Building2, MapPin, Search, Calendar } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+
+export default function SearchHero() {
+  const navigate = useNavigate();
+  const [searchData, setSearchData] = useState({
+    from: "",
+    to: "",
+    checkIn: "",
+    checkOut: "",
+    guests: 1
+  });
+
+  const handleSearch = (type) => {
+    // Navigate to respective search page with params
+    const params = new URLSearchParams(searchData);
+    navigate(`${createPageUrl(type)}?${params.toString()}`);
+  };
+
+  return (
+    <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 md:p-8 border border-white/20 shadow-2xl">
+      <Tabs defaultValue="flights" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 mb-6 bg-white/20 backdrop-blur-md">
+          <TabsTrigger value="flights" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-blue-700">
+            <Plane className="w-4 h-4" />
+            Flights
+          </TabsTrigger>
+          <TabsTrigger value="hotels" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-blue-700">
+            <Building2 className="w-4 h-4" />
+            Hotels
+          </TabsTrigger>
+          <TabsTrigger value="tours" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-blue-700">
+            <MapPin className="w-4 h-4" />
+            Tours
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="flights">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Input
+              placeholder="From"
+              value={searchData.from}
+              onChange={(e) => setSearchData({...searchData, from: e.target.value})}
+              className="bg-white/90 border-0 text-slate-800"
+            />
+            <Input
+              placeholder="To"
+              value={searchData.to}
+              onChange={(e) => setSearchData({...searchData, to: e.target.value})}
+              className="bg-white/90 border-0 text-slate-800"
+            />
+            <Input
+              type="date"
+              value={searchData.checkIn}
+              onChange={(e) => setSearchData({...searchData, checkIn: e.target.value})}
+              className="bg-white/90 border-0 text-slate-800"
+            />
+            <Button 
+              size="lg"
+              onClick={() => handleSearch("Flights")}
+              className="bg-orange-500 hover:bg-orange-600 text-white font-semibold"
+            >
+              <Search className="w-4 h-4 mr-2" />
+              Search Flights
+            </Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="hotels">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Input
+              placeholder="Destination"
+              value={searchData.to}
+              onChange={(e) => setSearchData({...searchData, to: e.target.value})}
+              className="bg-white/90 border-0 text-slate-800"
+            />
+            <Input
+              type="date"
+              value={searchData.checkIn}
+              onChange={(e) => setSearchData({...searchData, checkIn: e.target.value})}
+              className="bg-white/90 border-0 text-slate-800"
+            />
+            <Input
+              type="date"
+              value={searchData.checkOut}
+              onChange={(e) => setSearchData({...searchData, checkOut: e.target.value})}
+              className="bg-white/90 border-0 text-slate-800"
+            />
+            <Button 
+              size="lg"
+              onClick={() => handleSearch("Hotels")}
+              className="bg-orange-500 hover:bg-orange-600 text-white font-semibold"
+            >
+              <Search className="w-4 h-4 mr-2" />
+              Search Hotels
+            </Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="tours">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Input
+              placeholder="Destination"
+              value={searchData.to}
+              onChange={(e) => setSearchData({...searchData, to: e.target.value})}
+              className="bg-white/90 border-0 text-slate-800 md:col-span-2"
+            />
+            <Button 
+              size="lg"
+              onClick={() => handleSearch("Tours")}
+              className="bg-orange-500 hover:bg-orange-600 text-white font-semibold"
+            >
+              <Search className="w-4 h-4 mr-2" />
+              Explore Tours
+            </Button>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}

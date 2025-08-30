@@ -1,0 +1,87 @@
+{
+  "name": "Booking",
+  "type": "object",
+  "properties": {
+    "booking_type": {
+      "type": "string",
+      "enum": [
+        "flight",
+        "hotel",
+        "tour"
+      ],
+      "description": "Type of booking"
+    },
+    "reference_id": {
+      "type": "string",
+      "description": "Reference to the booked item (flight/hotel/tour ID)"
+    },
+    "booking_reference": {
+      "type": "string",
+      "description": "Unique booking reference number"
+    },
+    "customer_name": {
+      "type": "string",
+      "description": "Customer name"
+    },
+    "customer_email": {
+      "type": "string",
+      "description": "Customer email"
+    },
+    "customer_phone": {
+      "type": "string",
+      "description": "Customer phone number"
+    },
+    "total_amount": {
+      "type": "number",
+      "description": "Total booking amount"
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "paid",
+        "failed",
+        "refunded"
+      ],
+      "default": "pending",
+      "description": "Payment status"
+    },
+    "booking_status": {
+      "type": "string",
+      "enum": [
+        "confirmed",
+        "pending",
+        "cancelled"
+      ],
+      "default": "pending",
+      "description": "Booking status"
+    },
+    "booking_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date when booking was made"
+    },
+    "travel_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Travel/check-in date"
+    },
+    "num_passengers": {
+      "type": "number",
+      "default": 1,
+      "description": "Number of passengers/guests"
+    },
+    "special_requests": {
+      "type": "string",
+      "description": "Special requests or notes"
+    }
+  },
+  "required": [
+    "booking_type",
+    "reference_id",
+    "customer_name",
+    "customer_email",
+    "total_amount",
+    "travel_date"
+  ]
+}

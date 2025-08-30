@@ -1,0 +1,116 @@
+import React, { useState, useEffect, useCallback } from "react";
+import { Flight } from "@/entities/Flight";
+import FlightSearchForm from "../components/flights/FlightSearchForm";
+import FlightResults from "../components/flights/FlightResults";
+import FlightFilters from "../components/flights/FlightFilters";
+import { Plane } from "lucide-react";
+
+export default function Flights() {
+  const [flights, setFlights] = useState([]);
+  const [filteredFlights, setFilteredFlights] = useState([]);
+  const [searchCriteria, setSearchCriteria] = useState({});
+  const [filters, setFilters] = useState({
+    priceRange: [0, 2000],
+    airline: "",
+    class: "",
+    departureTime: ""
+  });
+  const [isLoading, setIsLoading] = useState(false);
+
+  const applyFilters = useCallback(() => {
+    let filtered = flights;
+
+    // Apply search criteria
+    if (searchCriteria.from) {
+      filtered = filtered.filter(flight => 
+        flight.departure_city?.toLowerCase().includes(searchCriteria.from.toLowerCase())
+      );
+    }
+    if (searchCriteria.to) {
+      filtered = filtered.filter(flight => 
+        flight.arrival_city?.toLowerCase().includes(searchCriteria.to.toLowerCase())
+      );
+    }
+    if (searchCriteria.date) {
+      filtered = filtered.filter(flight => flight.departure_date === searchCriteria.date);
+    }
+
+    // Apply filters
+    filtered = filtered.filter(flight => 
+      flight.price >= filters.priceRange[0] && flight.price <= filters.priceRange[1]
+    );
+
+    if (filters.airline) {
+      filtered = filtered.filter(flight => flight.airline === filters.airline);
+    }
+
+    if (filters.class) {
+      filtered = filtered.filter(flight => flight.class_type === filters.class);
+    }
+
+    setFilteredFlights(filtered);
+  }, [flights, filters, searchCriteria]);
+
+  useEffect(() => {
+    loadFlights();
+  }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [applyFilters]);
+
+  const loadFlights = async () => {
+    setIsLoading(true);
+    try {
+      const allFlights = await Flight.list("-created_date");
+      setFlights(allFlights);
+    } catch (error) {
+      console.error("Error loading flights:", error);
+    }
+    setIsLoading(false);
+  };
+
+  const handleSearch = (criteria) => {
+    setSearchCriteria(criteria);
+  };
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+              <Plane className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-slate-800">Find Your Perfect Flight</h1>
+          </div>
+          <p className="text-slate-600 text-lg">
+            Search and compare flights from hundreds of airlines worldwide
+          </p>
+        </div>
+
+        <FlightSearchForm onSearch={handleSearch} />
+
+        <div className="grid lg:grid-cols-4 gap-6 mt-8">
+          <div className="lg:col-span-1">
+            <FlightFilters 
+              filters={filters} 
+              onFilterChange={handleFilterChange}
+              flights={flights}
+            />
+          </div>
+          <div className="lg:col-span-3">
+            <FlightResults 
+              flights={filteredFlights} 
+              isLoading={isLoading}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

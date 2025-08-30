@@ -1,0 +1,54 @@
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Plane, Clock, Calendar } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import FlightCard from "./FlightCard";
+
+export default function FlightResults({ flights, isLoading }) {
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        {Array(5).fill(0).map((_, i) => (
+          <Card key={i} className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Skeleton className="w-12 h-12 rounded-lg" />
+                <div>
+                  <Skeleton className="h-6 w-32 mb-2" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+              </div>
+              <Skeleton className="h-10 w-24" />
+            </div>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  if (flights.length === 0) {
+    return (
+      <Card className="p-12 text-center">
+        <Plane className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+        <h3 className="text-xl font-semibold text-slate-800 mb-2">No flights found</h3>
+        <p className="text-slate-600">Try adjusting your search criteria or filters</p>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-slate-800">
+          {flights.length} flights found
+        </h3>
+      </div>
+      
+      {flights.map((flight) => (
+        <FlightCard key={flight.id} flight={flight} />
+      ))}
+    </div>
+  );
+}

@@ -1,0 +1,72 @@
+{
+  "name": "Hotel",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Hotel name"
+    },
+    "location": {
+      "type": "string",
+      "description": "Hotel location/address"
+    },
+    "city": {
+      "type": "string",
+      "description": "City where hotel is located"
+    },
+    "country": {
+      "type": "string",
+      "description": "Country where hotel is located"
+    },
+    "star_rating": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "Hotel star rating"
+    },
+    "price_per_night": {
+      "type": "number",
+      "description": "Price per night"
+    },
+    "available_rooms": {
+      "type": "number",
+      "description": "Number of available rooms"
+    },
+    "total_rooms": {
+      "type": "number",
+      "description": "Total rooms in hotel"
+    },
+    "amenities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of hotel amenities"
+    },
+    "room_type": {
+      "type": "string",
+      "enum": [
+        "standard",
+        "deluxe",
+        "suite",
+        "presidential"
+      ],
+      "default": "standard",
+      "description": "Type of room"
+    },
+    "description": {
+      "type": "string",
+      "description": "Hotel description"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Hotel image URL"
+    }
+  },
+  "required": [
+    "name",
+    "location",
+    "city",
+    "price_per_night"
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "name": "Flight",
+  "type": "object",
+  "properties": {
+    "airline": {
+      "type": "string",
+      "description": "Name of the airline"
+    },
+    "flight_number": {
+      "type": "string",
+      "description": "Flight number"
+    },
+    "departure_city": {
+      "type": "string",
+      "description": "Departure city"
+    },
+    "arrival_city": {
+      "type": "string",
+      "description": "Arrival city"
+    },
+    "departure_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Departure date"
+    },
+    "departure_time": {
+      "type": "string",
+      "description": "Departure time"
+    },
+    "arrival_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Arrival date"
+    },
+    "arrival_time": {
+      "type": "string",
+      "description": "Arrival time"
+    },
+    "duration": {
+      "type": "string",
+      "description": "Flight duration"
+    },
+    "price": {
+      "type": "number",
+      "description": "Base price per seat"
+    },
+    "available_seats": {
+      "type": "number",
+      "description": "Number of available seats"
+    },
+    "total_seats": {
+      "type": "number",
+      "description": "Total seats on flight"
+    },
+    "aircraft_type": {
+      "type": "string",
+      "description": "Type of aircraft"
+    },
+    "class_type": {
+      "type": "string",
+      "enum": [
+        "economy",
+        "business",
+        "first"
+      ],
+      "default": "economy",
+      "description": "Flight class"
+    }
+  },
+  "required": [
+    "airline",
+    "flight_number",
+    "departure_city",
+    "arrival_city",
+    "departure_date",
+    "price"
+  ]
+}

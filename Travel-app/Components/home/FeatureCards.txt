@@ -1,0 +1,76 @@
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Plane, Building2, MapPin, Shield, Clock, Headphones } from "lucide-react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+
+const features = [
+  {
+    icon: Plane,
+    title: "Flight Booking",
+    description: "Find and book flights from thousands of airlines worldwide with real-time pricing",
+    link: "Flights",
+    color: "bg-blue-500"
+  },
+  {
+    icon: Building2,
+    title: "Hotel Reservations",
+    description: "Discover perfect accommodations from luxury resorts to budget-friendly options",
+    link: "Hotels",
+    color: "bg-green-500"
+  },
+  {
+    icon: MapPin,
+    title: "Tour Packages",
+    description: "Curated travel experiences and guided tours to make your journey unforgettable",
+    link: "Tours",
+    color: "bg-purple-500"
+  },
+  {
+    icon: Shield,
+    title: "Secure Payments",
+    description: "Your transactions are protected with bank-level security and encryption",
+    color: "bg-orange-500"
+  },
+  {
+    icon: Clock,
+    title: "24/7 Availability",
+    description: "Book anytime, anywhere with our always-available online platform",
+    color: "bg-red-500"
+  },
+  {
+    icon: Headphones,
+    title: "Customer Support",
+    description: "Get help when you need it with our dedicated customer service team",
+    color: "bg-indigo-500"
+  }
+];
+
+export default function FeatureCards() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {features.map((feature, index) => {
+        const IconComponent = feature.icon;
+        return (
+          <Card key={index} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-white">
+            <CardContent className="p-6 text-center">
+              <div className={`w-16 h-16 ${feature.color} rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                <IconComponent className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-800 mb-3">{feature.title}</h3>
+              <p className="text-slate-600 mb-4 leading-relaxed">{feature.description}</p>
+              {feature.link && (
+                <Link to={createPageUrl(feature.link)}>
+                  <Button variant="outline" className="w-full group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+                    Explore
+                  </Button>
+                </Link>
+              )}
+            </CardContent>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}

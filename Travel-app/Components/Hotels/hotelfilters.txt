@@ -1,0 +1,77 @@
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Star } from "lucide-react";
+
+const ALL_AMENITIES = ["WiFi", "Pool", "Spa", "Gym", "Restaurant", "Parking"];
+
+export default function HotelFilters({ filters, onFilterChange }) {
+  
+  const handlePriceChange = (value) => {
+    onFilterChange({ ...filters, priceRange: value });
+  };
+
+  const handleRatingChange = (rating) => {
+    onFilterChange({ ...filters, starRating: rating });
+  };
+  
+  const handleAmenityChange = (amenity) => {
+    const newAmenities = filters.amenities.includes(amenity)
+      ? filters.amenities.filter(a => a !== amenity)
+      : [...filters.amenities, amenity];
+    onFilterChange({ ...filters, amenities: newAmenities });
+  };
+
+  return (
+    <Card className="border-0 shadow-md">
+      <CardHeader>
+        <CardTitle className="text-lg">Filter Hotels</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div>
+          <Label className="text-sm font-medium mb-3 block">
+            Price Range: ${filters.priceRange[0]} - ${filters.priceRange[1]}
+          </Label>
+          <Slider
+            value={filters.priceRange}
+            onValueChange={handlePriceChange}
+            max={1000}
+            min={0}
+            step={50}
+          />
+        </div>
+        <div>
+          <Label className="text-sm font-medium mb-3 block">Star Rating</Label>
+          <div className="flex items-center space-x-1">
+            {[1, 2, 3, 4, 5].map(star => (
+              <button key={star} onClick={() => handleRatingChange(star)}>
+                <Star
+                  className={`w-6 h-6 cursor-pointer ${
+                    star <= filters.starRating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+                  }`}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <Label className="text-sm font-medium mb-3 block">Amenities</Label>
+          <div className="space-y-2">
+            {ALL_AMENITIES.map(amenity => (
+              <div key={amenity} className="flex items-center space-x-2">
+                <Checkbox
+                  id={amenity}
+                  checked={filters.amenities.includes(amenity)}
+                  onCheckedChange={() => handleAmenityChange(amenity)}
+                />
+                <Label htmlFor={amenity}>{amenity}</Label>
+              </div>
+            ))}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

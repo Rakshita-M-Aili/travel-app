@@ -1,0 +1,81 @@
+import React, { useState, useEffect } from "react";
+import { User, Flight, Hotel, TourPackage, Booking } from "@/entities/all";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Users, Plane, Building2, MapPin, Calendar } from "lucide-react";
+import ManagementTab from "../components/admin/ManagementTab";
+
+const TABS = [
+  { value: 'flights', label: 'Flights', icon: Plane, entity: Flight, columns: [ { accessor: 'airline', header: 'Airline' }, { accessor: 'flight_number', header: 'Flight No.' }, { accessor: 'departure_city', header: 'From' }, { accessor: 'arrival_city', header: 'To' }, { accessor: 'price', header: 'Price' } ] },
+  { value: 'hotels', label: 'Hotels', icon: Building2, entity: Hotel, columns: [ { accessor: 'name', header: 'Name' }, { accessor: 'city', header: 'City' }, { accessor: 'star_rating', header: 'Rating' }, { accessor: 'price_per_night', header: 'Price/Night' } ] },
+  { value: 'tours', label: 'Tours', icon: MapPin, entity: TourPackage, columns: [ { accessor: 'name', header: 'Name' }, { accessor: 'destination', header: 'Destination' }, { accessor: 'duration_days', header: 'Days' }, { accessor: 'price', header: 'Price' } ] },
+  { value: 'bookings', label: 'Bookings', icon: Calendar, entity: Booking, columns: [ { accessor: 'booking_reference', header: 'Ref' }, { accessor: 'customer_name', header: 'Customer' }, { accessor: 'booking_type', header: 'Type' }, { accessor: 'total_amount', header: 'Amount' }, { accessor: 'booking_status', header: 'Status' } ] },
+];
+
+export default function Admin() {
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const currentUser = await User.me();
+        if (currentUser.role === 'admin') {
+          setUser(currentUser);
+        }
+      } catch (error) {
+        console.error("Authentication error", error);
+      }
+      setIsLoading(false);
+    };
+    checkUser();
+  }, []);
+
+  if (isLoading) {
+    return <div className="p-8">Loading...</div>;
+  }
+
+  if (!user) {
+    return (
+      <div className="p-8 text-center">
+        <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
+        <p>You must be an administrator to view this page.</p>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center">
+              <Users className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-slate-800">Admin Panel</h1>
+          </div>
+          <p className="text-slate-600 text-lg">Manage all aspects of the TravelHub platform</p>
+        </div>
+
+        <Tabs defaultValue="flights" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+            {TABS.map(tab => (
+              <TabsTrigger key={tab.value} value={tab.value} className="gap-2">
+                <tab.icon className="w-4 h-4" />
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          {TABS.map(tab => (
+            <TabsContent key={tab.value} value={tab.value} className="mt-6">
+              <ManagementTab
+                entity={tab.entity}
+                entityName={tab.label}
+                columns={tab.columns}
+              />
+            </TabsContent>
+          ))}
+        </Tabs>
+      </div>
+    </div>
+  );
+}
